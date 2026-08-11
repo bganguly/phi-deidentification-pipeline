@@ -63,6 +63,7 @@ fi
 if [[ "${TARGET}" == "local" ]]; then
   ENV_FILE="${ROOT_DIR}/.env"
   [[ ! -f "${ENV_FILE}" ]] && cp "${ROOT_DIR}/.env.example" "${ENV_FILE}"
+  _scan_sibling_keys
   if [[ -z "${ANTHROPIC_API_KEY:-}" ]] && ! grep -q "^ANTHROPIC_API_KEY=sk-ant" "${ENV_FILE}" 2>/dev/null; then
     read -rp "Enter your Anthropic API key (sk-ant-...): " _key
     [[ -z "${_key}" ]] && { echo "Error: API key required." >&2; exit 1; }
@@ -90,6 +91,7 @@ CLOUD_DB_URL="$(_cv DATABASE_URL)"
 CLOUD_DB_SYNC_URL="$(_cv DATABASE_SYNC_URL)"
 CLOUD_REDIS_URL="$(_cv REDIS_URL)"
 PIPELINE_ACCESS_TOKEN="$(_cv PIPELINE_ACCESS_TOKEN)"
+_scan_sibling_keys
 ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-$(_cv ANTHROPIC_API_KEY)}"
 
 [[ -z "${PIPELINE_ACCESS_TOKEN}" ]] && { echo "Error: PIPELINE_ACCESS_TOKEN missing from .env.cloud"; exit 1; }
