@@ -247,8 +247,3 @@ printf '  API Docs:    %s/docs\n' "$API_URL"
 printf '  Schedule:    8 am \xc2\xb7 5 pm PT weekdays\n'
 printf '  Tear down:   ./scripts/infra-down.sh --aws\n'
 
-PORTFOLIO_SET_LIVE="$(cd "${ROOT_DIR}/../../portfolio/scripts" 2>/dev/null && pwd || true)/set-live-url.sh"
-if [[ -f "$PORTFOLIO_SET_LIVE" ]]; then
-  printf '\n  Updating portfolio live-urls.js...\n'
-  bash "$PORTFOLIO_SET_LIVE" --tier "lite" phi "" "${API_URL}/docs"
-fi
