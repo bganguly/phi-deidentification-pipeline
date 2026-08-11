@@ -94,6 +94,12 @@ PIPELINE_ACCESS_TOKEN="$(_cv PIPELINE_ACCESS_TOKEN)"
 _scan_sibling_keys
 ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-$(_cv ANTHROPIC_API_KEY)}"
 
+if [[ -z "${CLOUD_DB_URL}" || -z "${CLOUD_DB_SYNC_URL}" ]]; then
+  printf '\nError: Cloud Run deploy requires DATABASE_URL and DATABASE_SYNC_URL in .env.cloud.\n'
+  printf '  No cloud database has ever been provisioned for this path (infra covers GKE + AWS only).\n'
+  printf '  Add a reachable PostgreSQL URL (e.g. Cloud SQL) to .env.cloud before retrying.\n'
+  exit 1
+fi
 [[ -z "${PIPELINE_ACCESS_TOKEN}" ]] && { echo "Error: PIPELINE_ACCESS_TOKEN missing from .env.cloud"; exit 1; }
 if [[ -z "${ANTHROPIC_API_KEY}" ]]; then
   read -rsp "Anthropic API key (sk-ant-...): " ANTHROPIC_API_KEY; echo
