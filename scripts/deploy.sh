@@ -108,9 +108,8 @@ IMAGE="gcr.io/${GCP_PROJECT}/${SERVICE_NAME}:latest"
 
 echo "▶ Building and pushing image via Cloud Build..."
 gcloud builds submit "${ROOT_DIR}" \
-  --tag "${IMAGE}" \
-  --project "${GCP_PROJECT}" \
-  --gcs-log-dir "gs://${GCP_PROJECT}_cloudbuild/logs"
+  --config "${ROOT_DIR}/cloudbuild.yaml" \
+  --project "${GCP_PROJECT}"
 
 echo "▶ Deploying to Cloud Run (${GCP_REGION})..."
 gcloud run deploy "${SERVICE_NAME}" \
