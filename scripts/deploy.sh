@@ -13,6 +13,26 @@ _aws_tf_ws_count() {
 }
 _aws_lite_count=$(_aws_tf_ws_count lite)
 
+_scan_sibling_keys() {
+  [[ -n "${ANTHROPIC_API_KEY:-}" ]] && return
+  local parent_dir dir env_file candidate found_in
+  parent_dir="$(cd "${ROOT_DIR}/.." && pwd)"
+  for dir in "${parent_dir}"/*/; do
+    [[ -d "$dir" ]] || continue
+    dir="$(cd "$dir" && pwd)"
+    [[ "$dir" == "$ROOT_DIR" ]] && continue
+    env_file="${dir}/.env"
+    [[ -f "$env_file" ]] || continue
+    candidate="$(grep "^ANTHROPIC_API_KEY=sk-ant" "$env_file" 2>/dev/null | head -1 | cut -d= -f2- || true)"
+    if [[ -n "$candidate" ]]; then
+      found_in="$(basename "$dir")"
+      printf '  Found ANTHROPIC_API_KEY in sibling repo: %s\n' "$found_in"
+      export ANTHROPIC_API_KEY="$candidate"
+      return
+    fi
+  done
+}
+
 printf '\n=== phi-deidentification-pipeline ===\n\n'
 printf '  [1] Local  — Docker Compose local stack\n'
 printf '  [2] Cloud  — GCP Cloud Run\n'
@@ -118,6 +138,8 @@ exit 0
 fi
 
 # ── AWS ECS ───────────────────────────────────────────────────────────────────
+printf '\n  Scanning sibling repos for credentials...\n'
+_scan_sibling_keys
 printf '\n--- AWS Lite summary ---\n'
 printf '  Pipeline: ECS Fargate 1 vCPU / 2 GB (api + worker + redis sidecar)\n'
 printf '  DB:       RDS PostgreSQL 16 db.t3.micro (20 GB)\n'
