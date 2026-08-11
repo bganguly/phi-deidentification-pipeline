@@ -106,18 +106,11 @@ GCP_REGION="${GCP_REGION:-us-central1}"
 SERVICE_NAME="phi-pipeline-api"
 IMAGE="gcr.io/${GCP_PROJECT}/${SERVICE_NAME}:latest"
 
-if ! docker info >/dev/null 2>&1; then
-  echo "▶ Starting Docker Desktop..."
-  open -a Docker
-  until docker info >/dev/null 2>&1; do sleep 2; done
-  echo "▶ Docker ready"
-fi
-
-echo "▶ Building image..."
-docker build -f "${ROOT_DIR}/docker/Dockerfile.api" -t "${IMAGE}" "${ROOT_DIR}"
-
-echo "▶ Pushing to GCR..."
-docker push "${IMAGE}"
+echo "▶ Building and pushing image via Cloud Build..."
+gcloud builds submit "${ROOT_DIR}" \
+  --tag "${IMAGE}" \
+  --project "${GCP_PROJECT}" \
+  --gcs-log-dir "gs://${GCP_PROJECT}_cloudbuild/logs"
 
 echo "▶ Deploying to Cloud Run (${GCP_REGION})..."
 gcloud run deploy "${SERVICE_NAME}" \
