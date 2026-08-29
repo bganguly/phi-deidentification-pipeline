@@ -15,11 +15,10 @@ analytical signal. Full observability via structured JSON logs, Prometheus metri
 
 ## Using the App
 
-Three live pages are linked from the portfolio demo:
-
-1. **Pipeline** — architecture diagram and trace walkthrough for a single record through spaCy tier-1 and Claude fallback.
-2. **Browser demo** — paste any clinical text (or use the prefilled example) and click **De-identify**. Claude Haiku 4.5 detects PHI and returns synthetic replacements in real time. Requires an Anthropic API key in the browser.
-3. **Batch run** — generates 50 synthetic clinical records, submits them to the live Cloud Run API, and streams real-time progress across 3 parallel Celery workers.
+1. **Open the Browser demo** — from the portfolio page, click **Browser demo**. Paste any clinical text (or use the prefilled example) and click **De-identify**. Claude Haiku 4.5 detects PHI entities and returns synthetic replacements in real time. An Anthropic API key is required.
+2. **Run the Batch job** — click **Batch run** to generate 50 synthetic clinical records and submit them to the live Cloud Run API. Three parallel Celery workers process them concurrently; per-record progress streams in real time.
+3. **Inspect a Jaeger trace** — after the batch run, click any Jaeger link in the results table to see the full OTel span: which tier fired, confidence score, entity count, and substitution time.
+4. **Explore the Pipeline diagram** — click **Pipeline** for the architecture walkthrough of a single record through spaCy tier-1 and Claude fallback, with annotated span decisions.
 
 ### Iterative use patterns
 
