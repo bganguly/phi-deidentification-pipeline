@@ -7,7 +7,7 @@ analytical signal. Full observability via structured JSON logs, Prometheus metri
 
 > **Demo batch:** 50 clinical records generated on the fly · ~350 PHI entities detected and replaced · <10% of records reach Claude · 3 parallel Celery workers · real-time progress with per-record Jaeger trace links
 
-**[→ Portfolio demo](https://bganguly.github.io/?open=phi)**
+**[→ Portfolio demo](https://bganguly.github.io/#phi_deidentification)**
 
 > **Schedule:** ECS Fargate runs weekdays 8 am – 5 pm PT. The static pipeline diagram and browser demo are always available via the portfolio.
 
