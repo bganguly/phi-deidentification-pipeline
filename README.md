@@ -123,18 +123,6 @@ flowchart TD
 | **Time-limited tokens** | HMAC-SHA256 bearer tokens with 48h expiry via `grant-access.sh` — no long-lived credentials exposed |
 
 
-## Deployment / Running
-
-```bash
-./scripts/deploy.sh        # local Docker Compose or Cloud Run
-./scripts/infra-down.sh    # stop local stack or tear down cloud
-```
-
-Local prerequisites: Python 3.11+. An `ANTHROPIC_API_KEY` is prompted on first run.
-Local stack starts: FastAPI API · Celery worker · PostgreSQL 16 · Redis 7 · Jaeger · Prometheus · Grafana.
-
----
-
 ## Stack
 
 | Component | Implementation |
@@ -151,3 +139,15 @@ Local stack starts: FastAPI API · Celery worker · PostgreSQL 16 · Redis 7 · 
 | **IaC** | Terraform (`infra/`) — GKE cluster, Cloud SQL, Artifact Registry, VPC; `k8s/` manifests with HPA for worker autoscaling; `cloudbuild.yaml` for Cloud Build |
 
 ---
+## Deployment / Running
+
+```bash
+./scripts/deploy.sh        # local Docker Compose or Cloud Run
+./scripts/infra-down.sh    # stop local stack or tear down cloud
+```
+
+Local prerequisites: Python 3.11+. An `ANTHROPIC_API_KEY` is prompted on first run.
+Local stack starts: FastAPI API · Celery worker · PostgreSQL 16 · Redis 7 · Jaeger · Prometheus · Grafana.
+
+---
+
