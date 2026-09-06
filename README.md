@@ -123,7 +123,7 @@ flowchart TD
 | **Time-limited tokens** | HMAC-SHA256 bearer tokens with 48h expiry via `grant-access.sh` — no long-lived credentials exposed |
 
 
-## Running
+## Deployment / Running
 
 ```bash
 ./scripts/deploy.sh        # local Docker Compose or Cloud Run
@@ -134,6 +134,8 @@ Local prerequisites: Python 3.11+. An `ANTHROPIC_API_KEY` is prompted on first r
 Local stack starts: FastAPI API · Celery worker · PostgreSQL 16 · Redis 7 · Jaeger · Prometheus · Grafana.
 
 ---
+
+## Stack
 
 | Component | Implementation |
 |---|---|
