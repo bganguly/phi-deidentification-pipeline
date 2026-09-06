@@ -50,33 +50,6 @@ The browser demo is stateless — each paste-and-run is independent. The batch r
 
 ---
 
-## Running
-
-```bash
-./scripts/deploy.sh        # local Docker Compose or Cloud Run
-./scripts/infra-down.sh    # stop local stack or tear down cloud
-```
-
-Local prerequisites: Python 3.11+. An `ANTHROPIC_API_KEY` is prompted on first run.
-Local stack starts: FastAPI API · Celery worker · PostgreSQL 16 · Redis 7 · Jaeger · Prometheus · Grafana.
-
----
-
-| Component | Implementation |
-|---|---|
-| **Tier-1 detection** | spaCy `en_core_sci_md` biomedical NER: PERSON, DATE, GPE, LOC, ORG (confidence 0.90); regex patterns: SSN, MRN, PHONE, EMAIL (confidence 0.97) |
-| **Tier-2 detection** | Claude Haiku 4.5 via Anthropic SDK; invoked only when spaCy/regex finds nothing but PHI-indicator keywords (`patient`, `ssn`, `mrn`) are present; returns structured JSON with character offsets |
-| **Confidence threshold** | 0.85 per-record mean; configurable via `CONFIDENCE_THRESHOLD` env var; set to 1.0 to disable Claude entirely |
-| **Synthetic substitution** | Faker-generated replacements per entity type; applied by offset descending to avoid span-shift bugs |
-| **Audit log** | SHA-256 hash of every original PHI value written to `redaction_log` in PostgreSQL with entity type, confidence, and detecting model — no raw PII retained |
-| **Async batch processing** | FastAPI `POST /ingest/batch` writes job + record rows to PostgreSQL, enqueues one Celery task per record onto Redis; returns `job_id` immediately |
-| **Auth** | HMAC-SHA256 time-limited bearer tokens; `grant-access.sh` issues 48h tokens |
-| **Observability** | Prometheus `/metrics` endpoint; OpenTelemetry traces → Jaeger (OTLP gRPC 4317); structured JSON logging per record |
-| **Backend** | FastAPI 0.115 + asyncpg; Celery workers consume Redis queue; Alembic DDL migrations on PostgreSQL 16 |
-| **IaC** | Terraform (`infra/`) — GKE cluster, Cloud SQL, Artifact Registry, VPC; `k8s/` manifests with HPA for worker autoscaling; `cloudbuild.yaml` for Cloud Build |
-
----
-
 ## Architecture
 
 ### Processing flow — step by step
@@ -149,3 +122,30 @@ flowchart TD
 | **Offset-descending substitution** | Applying replacements from last span to first ensures earlier span offsets remain valid throughout the substitution loop |
 | **Time-limited tokens** | HMAC-SHA256 bearer tokens with 48h expiry via `grant-access.sh` — no long-lived credentials exposed |
 
+
+## Running
+
+```bash
+./scripts/deploy.sh        # local Docker Compose or Cloud Run
+./scripts/infra-down.sh    # stop local stack or tear down cloud
+```
+
+Local prerequisites: Python 3.11+. An `ANTHROPIC_API_KEY` is prompted on first run.
+Local stack starts: FastAPI API · Celery worker · PostgreSQL 16 · Redis 7 · Jaeger · Prometheus · Grafana.
+
+---
+
+| Component | Implementation |
+|---|---|
+| **Tier-1 detection** | spaCy `en_core_sci_md` biomedical NER: PERSON, DATE, GPE, LOC, ORG (confidence 0.90); regex patterns: SSN, MRN, PHONE, EMAIL (confidence 0.97) |
+| **Tier-2 detection** | Claude Haiku 4.5 via Anthropic SDK; invoked only when spaCy/regex finds nothing but PHI-indicator keywords (`patient`, `ssn`, `mrn`) are present; returns structured JSON with character offsets |
+| **Confidence threshold** | 0.85 per-record mean; configurable via `CONFIDENCE_THRESHOLD` env var; set to 1.0 to disable Claude entirely |
+| **Synthetic substitution** | Faker-generated replacements per entity type; applied by offset descending to avoid span-shift bugs |
+| **Audit log** | SHA-256 hash of every original PHI value written to `redaction_log` in PostgreSQL with entity type, confidence, and detecting model — no raw PII retained |
+| **Async batch processing** | FastAPI `POST /ingest/batch` writes job + record rows to PostgreSQL, enqueues one Celery task per record onto Redis; returns `job_id` immediately |
+| **Auth** | HMAC-SHA256 time-limited bearer tokens; `grant-access.sh` issues 48h tokens |
+| **Observability** | Prometheus `/metrics` endpoint; OpenTelemetry traces → Jaeger (OTLP gRPC 4317); structured JSON logging per record |
+| **Backend** | FastAPI 0.115 + asyncpg; Celery workers consume Redis queue; Alembic DDL migrations on PostgreSQL 16 |
+| **IaC** | Terraform (`infra/`) — GKE cluster, Cloud SQL, Artifact Registry, VPC; `k8s/` manifests with HPA for worker autoscaling; `cloudbuild.yaml` for Cloud Build |
+
+---
