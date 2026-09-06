@@ -149,28 +149,3 @@ flowchart TD
 | **Offset-descending substitution** | Applying replacements from last span to first ensures earlier span offsets remain valid throughout the substitution loop |
 | **Time-limited tokens** | HMAC-SHA256 bearer tokens with 48h expiry via `grant-access.sh` — no long-lived credentials exposed |
 
----
-
-## Entity Types and Replacements
-
-| PHI Type | Detection | Replacement |
-|---|---|---|
-| `PERSON` | spaCy NER | `faker.name()` |
-| `DATE` | spaCy NER | Date shifted ±30 days |
-| `SSN` | Regex `\d{3}-\d{2}-\d{4}` | `faker.ssn()` |
-| `MRN` | Regex `MRN[:\s#-]*\d{6,10}` | `MRN-########` |
-| `PHONE` | Regex (US formats) | `faker.phone_number()` |
-| `EMAIL` | Regex RFC-5321 | `faker.email()` |
-| `GPE` / `LOC` | spaCy NER | `faker.city()` |
-| `ORG` | spaCy NER | `faker.company()` |
-
----
-
-## Local Endpoints
-
-| Service | URL |
-|---|---|
-| API + Swagger UI | http://localhost:8000/docs |
-| Jaeger traces | http://localhost:16686 |
-| Prometheus | http://localhost:9090 |
-| Grafana | http://localhost:3000 (admin / admin) |
